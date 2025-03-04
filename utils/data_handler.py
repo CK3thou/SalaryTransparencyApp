@@ -23,23 +23,38 @@ def load_data():
         else:
             return empty_df
     except Exception as e:
-        st.error(f"Error loading data: {str(e)}")
+        print(f"Error loading data: {str(e)}")
         return empty_df
 
 def save_submission(data):
-    """Save new submission to both Excel and CSV files"""
+    """Save new submission to the current data file"""
     df = load_data()
     new_row = pd.DataFrame([data])
 
-    if os.path.exists('data/salary_data.xlsx'):
-        df = pd.concat([df, new_row], ignore_index=True)
-        df.to_excel('data/salary_data.xlsx', index=False)
-    else:
-        # If Excel file doesn't exist, save to CSV
-        if os.path.exists('data/salary_data.csv'):
+    try:
+        # If Excel file exists, append to it
+        if os.path.exists('data/salary_data.xlsx'):
             df = pd.concat([df, new_row], ignore_index=True)
+            df.to_excel('data/salary_data.xlsx', index=False)
         else:
-            df = new_row
-        df.to_csv('data/salary_data.csv', index=False)
+            # Otherwise, append to CSV
+            if os.path.exists('data/salary_data.csv'):
+                df = pd.concat([df, new_row], ignore_index=True)
+            else:
+                df = new_row
+            df.to_csv('data/salary_data.csv', index=False)
+        return True
+    except Exception as e:
+        print(f"Error saving submission: {str(e)}")
+        return False
 
-    return True
+def save_uploaded_file(df):
+    """Save uploaded Excel file data"""
+    try:
+        # Save to both Excel and CSV for backup
+        df.to_excel('data/salary_data.xlsx', index=False)
+        df.to_csv('data/salary_data.csv', index=False)
+        return True
+    except Exception as e:
+        print(f"Error saving uploaded file: {str(e)}")
+        return False
