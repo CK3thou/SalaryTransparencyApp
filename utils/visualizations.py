@@ -23,17 +23,32 @@ def create_salary_distribution(df):
 
 def create_experience_salary_correlation(df):
     """Create experience vs salary scatter plot with trend line"""
-    fig = px.scatter(
-        df,
-        x='Years of Experience',
-        y='Monthly Gross Salary (in ZMW)',
-        title='Experience vs Salary Correlation',
-        labels={
-            'Years of Experience': 'Experience (Years)',
-            'Monthly Gross Salary (in ZMW)': 'Salary (ZMW)'
-        },
-        trendline="ols"  # Add trend line
-    )
+    try:
+        # Try to create scatter plot with trend line
+        fig = px.scatter(
+            df,
+            x='Years of Experience',
+            y='Monthly Gross Salary (in ZMW)',
+            title='Experience vs Salary Correlation',
+            labels={
+                'Years of Experience': 'Experience (Years)',
+                'Monthly Gross Salary (in ZMW)': 'Salary (ZMW)'
+            },
+            trendline="lowess"  # Use lowess instead of ols, more robust
+        )
+    except Exception as e:
+        # Fallback to basic scatter plot without trend line
+        fig = px.scatter(
+            df,
+            x='Years of Experience',
+            y='Monthly Gross Salary (in ZMW)',
+            title='Experience vs Salary Correlation',
+            labels={
+                'Years of Experience': 'Experience (Years)',
+                'Monthly Gross Salary (in ZMW)': 'Salary (ZMW)'
+            }
+        )
+
     fig.update_layout(
         height=400,
         margin=dict(l=10, r=10, t=40, b=20),
