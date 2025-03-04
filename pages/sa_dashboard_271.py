@@ -19,11 +19,27 @@ def check_password():
 
         if st.button("Login"):
             try:
-                if password == st.secrets.admin_password:
+                # Try both ways of accessing the secret
+                stored_password = None
+                try:
+                    stored_password = st.secrets["admin_password"]
+                except:
+                    try:
+                        stored_password = st.secrets.admin_password
+                    except Exception as e:
+                        st.error(f"Could not access admin_password from secrets: {str(e)}")
+                        return False
+
+                if stored_password is None:
+                    st.error("Admin password is not properly configured. Please contact support.")
+                    return False
+
+                if password == stored_password:
                     st.session_state.password_correct = True
                     st.rerun()
                 else:
                     st.error("😕 Password incorrect")
+                    return False
             except Exception as e:
                 st.error(f"Authentication error: {str(e)}")
                 return False
