@@ -1,7 +1,11 @@
 import streamlit as st
 import pandas as pd
 from utils.data_handler import load_data, save_submission
-from utils.visualizations import create_salary_distribution, create_experience_salary_correlation
+from utils.visualizations import (
+    create_salary_distribution, create_experience_salary_correlation,
+    create_industry_salary_box, create_degree_distribution,
+    create_top_roles_salary
+)
 from components.forms import submission_form
 from components.filters import country_filter
 
@@ -41,6 +45,15 @@ def main():
                 width: 100%;
                 min-width: unset !important;
             }
+            /* Style tabs for better mobile view */
+            .stTabs [data-baseweb="tab-list"] {
+                gap: 8px;
+                overflow-x: auto;
+            }
+            .stTabs [data-baseweb="tab"] {
+                white-space: nowrap;
+                padding: 0.5rem;
+            }
         </style>
     """, unsafe_allow_html=True)
 
@@ -74,16 +87,44 @@ def main():
                 unique_roles = len(country_data['Role'].unique())
                 st.metric("Unique Roles", unique_roles)
 
-            # Charts with responsive container width
-            chart_container = st.container()
-            with chart_container:
+            # Create tabs for different visualizations
+            tab1, tab2, tab3, tab4, tab5 = st.tabs([
+                "Salary Distribution", "Experience Impact",
+                "Industry Analysis", "Education Impact",
+                "Role Analysis"
+            ])
+
+            with tab1:
                 st.plotly_chart(
                     create_salary_distribution(country_data),
                     use_container_width=True,
                     config={'responsive': True}
                 )
+
+            with tab2:
                 st.plotly_chart(
                     create_experience_salary_correlation(country_data),
+                    use_container_width=True,
+                    config={'responsive': True}
+                )
+
+            with tab3:
+                st.plotly_chart(
+                    create_industry_salary_box(country_data),
+                    use_container_width=True,
+                    config={'responsive': True}
+                )
+
+            with tab4:
+                st.plotly_chart(
+                    create_degree_distribution(country_data),
+                    use_container_width=True,
+                    config={'responsive': True}
+                )
+
+            with tab5:
+                st.plotly_chart(
+                    create_top_roles_salary(country_data),
                     use_container_width=True,
                     config={'responsive': True}
                 )
