@@ -8,10 +8,42 @@ from components.filters import country_filter
 st.set_page_config(
     page_title="Salary Transparency Platform",
     page_icon="💰",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"  # Better for mobile
 )
 
 def main():
+    # Custom CSS for mobile responsiveness
+    st.markdown("""
+        <style>
+            /* Mobile-first styles */
+            .stDataFrame {
+                width: 100%;
+                overflow-x: auto;
+            }
+            .st-emotion-cache-1y4p8pa {  /* Streamlit's column class */
+                min-width: 250px !important;
+            }
+            /* Improve padding on mobile */
+            .main .block-container {
+                padding-top: 1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            /* Make metrics more compact on mobile */
+            [data-testid="metric-container"] {
+                width: 100%;
+                min-width: unset;
+                padding: 0.5rem;
+            }
+            /* Adjust chart container for mobile */
+            .plotly-chart-container {
+                width: 100%;
+                min-width: unset !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.title("Salary Transparency Platform")
 
     # Load data
@@ -21,7 +53,7 @@ def main():
     st.subheader("Salary Data Overview")
 
     if not df.empty:
-        # Country selection
+        # Country selection - full width on mobile
         selected_country = country_filter(df)
 
         # Filter data by country
@@ -31,23 +63,34 @@ def main():
             country_data = df
 
         if not country_data.empty:
-            # Display statistics
-            col1, col2, col3 = st.columns(3)
-            with col1:
+            # Responsive metrics layout
+            metrics = st.columns([1, 1, 1])
+            with metrics[0]:
                 st.metric("Total Entries", len(country_data))
-            with col2:
+            with metrics[1]:
                 avg_salary = country_data['Monthly Gross Salary (in ZMW)'].mean()
                 st.metric("Average Salary (ZMW)", f"{avg_salary:,.2f}")
-            with col3:
+            with metrics[2]:
                 unique_roles = len(country_data['Role'].unique())
                 st.metric("Unique Roles", unique_roles)
 
-            # Display visualizations
-            st.plotly_chart(create_salary_distribution(country_data), use_container_width=True)
-            st.plotly_chart(create_experience_salary_correlation(country_data), use_container_width=True)
+            # Charts with responsive container width
+            chart_container = st.container()
+            with chart_container:
+                st.plotly_chart(
+                    create_salary_distribution(country_data),
+                    use_container_width=True,
+                    config={'responsive': True}
+                )
+                st.plotly_chart(
+                    create_experience_salary_correlation(country_data),
+                    use_container_width=True,
+                    config={'responsive': True}
+                )
 
-            # Display data table
+            # Data table with horizontal scroll on mobile
             st.subheader("Detailed Data")
+            st.markdown('<div class="table-container">', unsafe_allow_html=True)
             st.dataframe(
                 country_data[[
                     'Role', 'Monthly Gross Salary (in ZMW)', 
@@ -57,15 +100,15 @@ def main():
                 use_container_width=True,
                 hide_index=True
             )
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.info("No data available for this country yet. Be the first to contribute!")
     else:
         st.info("No salary data available yet. Be the first to contribute!")
 
-    # Submission form
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Submit Your Salary Data")
-    submission_form(save_submission)
+    # Mobile-friendly submission form
+    with st.expander("Submit Your Salary Data", expanded=False):
+        submission_form(save_submission)
 
 if __name__ == "__main__":
     main()

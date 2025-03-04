@@ -3,47 +3,63 @@ import streamlit as st
 def submission_form(save_callback):
     """Render and handle the salary submission form"""
     with st.form("salary_submission"):
-        role = st.text_input("Role*")
-        company_location = st.text_input("Company Location (Country)*")
+        # Use columns for better mobile layout
+        col1, col2 = st.columns(2)
 
-        salary_zmw = st.number_input(
-            "Monthly Gross Salary (in ZMW)*",
-            min_value=0.0,
-            value=0.0
-        )
+        with col1:
+            role = st.text_input("Role*", key="role_mobile")
+            company_location = st.text_input("Company Location*", key="location_mobile")
+            salary_zmw = st.number_input(
+                "Monthly Salary (ZMW)*",
+                min_value=0.0,
+                value=0.0,
+                key="salary_zmw_mobile"
+            )
+            salary_usd = st.number_input(
+                "Salary in USD",
+                min_value=0.0,
+                value=0.0,
+                key="salary_usd_mobile"
+            )
+            experience = st.number_input(
+                "Years of Experience*",
+                min_value=0,
+                value=0,
+                key="experience_mobile"
+            )
 
-        salary_usd = st.number_input(
-            "Salary Gross in USD (optional)",
-            min_value=0.0,
-            value=0.0
-        )
+        with col2:
+            degree = st.selectbox(
+                "Do you have a degree?*",
+                options=["Yes", "No"],
+                key="degree_mobile"
+            )
+            employees = st.number_input(
+                "Company Size*",
+                min_value=1,
+                value=1,
+                key="employees_mobile"
+            )
+            your_location = st.text_input("Your Location*", key="your_location_mobile")
+            nationality = st.text_input("Nationality*", key="nationality_mobile")
+            industry = st.text_input("Industry*", key="industry_mobile")
 
-        experience = st.number_input(
-            "Years of Experience*",
-            min_value=0,
-            value=0
-        )
-
-        degree = st.selectbox(
-            "Do you have a degree?*",
-            options=["Yes", "No"]
-        )
-
-        employees = st.number_input(
-            "Approx. No. of employees in company*",
-            min_value=1,
-            value=1
-        )
-
-        your_location = st.text_input("Your Country/Location*")
-        nationality = st.text_input("Nationality*")
-        industry = st.text_input("Industry*")
+        st.markdown("""
+            <style>
+                div[data-testid="stForm"] {
+                    padding: 1rem;
+                    border-radius: 10px;
+                }
+                div[data-testid="stFormSubmitButton"] {
+                    margin-top: 1rem;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
         st.markdown("*Required fields")
         submitted = st.form_submit_button("Submit")
 
         if submitted:
-            # Validate required fields
             if not all([role, company_location, salary_zmw, experience, 
                        your_location, nationality, industry]):
                 st.error("Please fill in all required fields.")

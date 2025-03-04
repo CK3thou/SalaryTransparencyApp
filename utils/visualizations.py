@@ -12,7 +12,11 @@ def create_salary_distribution(df):
     )
     fig.update_layout(
         showlegend=False,
-        height=400
+        height=400,
+        margin=dict(l=10, r=10, t=40, b=20),  # Tighter margins for mobile
+        title_x=0.5,  # Center title
+        xaxis_title_standoff=10,
+        yaxis_title_standoff=10
     )
     return fig
 
@@ -28,5 +32,11 @@ def create_experience_salary_correlation(df):
             'Monthly Gross Salary (in ZMW)': 'Salary (ZMW)'
         }
     )
-    fig.update_layout(height=400)
+    fig.update_layout(
+        height=400,
+        margin=dict(l=10, r=10, t=40, b=20),  # Tighter margins for mobile
+        title_x=0.5,  # Center title
+        xaxis_title_standoff=10,
+        yaxis_title_standoff=10
+    )
     return fig
