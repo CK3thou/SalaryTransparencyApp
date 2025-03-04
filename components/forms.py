@@ -3,46 +3,52 @@ import streamlit as st
 def submission_form(save_callback):
     """Render and handle the salary submission form"""
     with st.form("salary_submission"):
-        role = st.text_input("Role", required=True)
-        company_location = st.text_input("Company Location (Country)", required=True)
-        
+        role = st.text_input("Role*")
+        company_location = st.text_input("Company Location (Country)*")
+
         salary_zmw = st.number_input(
-            "Monthly Gross Salary (in ZMW)",
+            "Monthly Gross Salary (in ZMW)*",
             min_value=0.0,
-            required=True
+            value=0.0
         )
-        
+
         salary_usd = st.number_input(
             "Salary Gross in USD (optional)",
             min_value=0.0,
-            required=False
+            value=0.0
         )
-        
+
         experience = st.number_input(
-            "Years of Experience",
+            "Years of Experience*",
             min_value=0,
-            required=True
+            value=0
         )
-        
+
         degree = st.selectbox(
-            "Do you have a degree?",
-            options=["Yes", "No"],
-            required=True
+            "Do you have a degree?*",
+            options=["Yes", "No"]
         )
-        
+
         employees = st.number_input(
-            "Approx. No. of employees in company",
+            "Approx. No. of employees in company*",
             min_value=1,
-            required=True
+            value=1
         )
-        
-        your_location = st.text_input("Your Country/Location", required=True)
-        nationality = st.text_input("Nationality", required=True)
-        industry = st.text_input("Industry", required=True)
-        
+
+        your_location = st.text_input("Your Country/Location*")
+        nationality = st.text_input("Nationality*")
+        industry = st.text_input("Industry*")
+
+        st.markdown("*Required fields")
         submitted = st.form_submit_button("Submit")
-        
+
         if submitted:
+            # Validate required fields
+            if not all([role, company_location, salary_zmw, experience, 
+                       your_location, nationality, industry]):
+                st.error("Please fill in all required fields.")
+                return False
+
             data = {
                 'Role': role,
                 'Company location (Country)': company_location,
@@ -55,7 +61,7 @@ def submission_form(save_callback):
                 'Nationality': nationality,
                 'Industry': industry
             }
-            
+
             if save_callback(data):
                 st.success("Thank you for your submission!")
                 return True
