@@ -4,36 +4,31 @@ from utils.data_handler import load_data, save_uploaded_file
 
 def check_password():
     """Returns `True` if the user had the correct password."""
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == st.secrets["admin_password"]:
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Don't store password
-        else:
-            st.session_state["password_correct"] = False
 
-    if "password_correct" not in st.session_state:
-        # First run, show input for password
-        st.text_input(
+    # Initialize session state
+    if 'password_correct' not in st.session_state:
+        st.session_state.password_correct = False
+
+    if not st.session_state.password_correct:
+        # Show password input
+        password = st.text_input(
             "Please enter the admin password", 
-            type="password", 
-            on_change=password_entered, 
-            key="password"
+            type="password",
+            key="password_input"
         )
-        return False
-    elif not st.session_state["password_correct"]:
-        # Password incorrect, show input + error
-        st.text_input(
-            "Please enter the admin password", 
-            type="password", 
-            on_change=password_entered, 
-            key="password"
-        )
-        st.error("😕 Password incorrect")
-        return False
-    else:
-        # Password correct
-        return True
+
+        if st.button("Login"):
+            try:
+                if password == st.secrets.admin_password:
+                    st.session_state.password_correct = True
+                    st.rerun()
+                else:
+                    st.error("😕 Password incorrect")
+            except Exception as e:
+                st.error(f"Authentication error: {str(e)}")
+                return False
+
+    return st.session_state.password_correct
 
 def edit_data():
     df = load_data()
