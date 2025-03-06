@@ -17,42 +17,63 @@ st.set_page_config(
 )
 
 def main():
-    # Custom CSS for mobile responsiveness
+    # PWA Setup
+    st.markdown("""
+        <link rel="manifest" href="static/manifest.json">
+        <meta name="theme-color" content="#0066cc">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-title" content="SalaryApp">
+        <link rel="apple-touch-icon" href="static/icons/icon-192.png">
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/static/sw.js');
+                });
+            }
+        </script>
+    """, unsafe_allow_html=True)
+
+    # Mobile-first styles
     st.markdown("""
         <style>
             /* Mobile-first styles */
-            .stDataFrame {
-                width: 100%;
-                overflow-x: auto;
+            @media (max-width: 768px) {
+                .main .block-container {
+                    padding: 1rem !important;
+                }
+                .stDataFrame {
+                    font-size: 14px;
+                }
+                .stSelectbox {
+                    max-width: 100% !important;
+                }
+                /* Improve touch targets */
+                .stButton > button {
+                    min-height: 44px;
+                }
+                /* Make charts responsive */
+                .plotly-chart-container {
+                    width: 100% !important;
+                }
             }
-            .st-emotion-cache-1y4p8pa {  /* Streamlit's column class */
-                min-width: 250px !important;
+            /* Hide desktop-only elements on mobile */
+            @media (max-width: 768px) {
+                .desktop-only {
+                    display: none !important;
+                }
             }
-            /* Improve padding on mobile */
-            .main .block-container {
-                padding-top: 1rem;
-                padding-left: 1rem;
-                padding-right: 1rem;
+            /* Native-like app styling */
+            body {
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
             }
-            /* Make metrics more compact on mobile */
-            [data-testid="metric-container"] {
-                width: 100%;
-                min-width: unset;
-                padding: 0.5rem;
-            }
-            /* Adjust chart container for mobile */
-            .plotly-chart-container {
-                width: 100%;
-                min-width: unset !important;
-            }
-            /* Style tabs for better mobile view */
-            .stTabs [data-baseweb="tab-list"] {
-                gap: 8px;
-                overflow-x: auto;
-            }
-            .stTabs [data-baseweb="tab"] {
-                white-space: nowrap;
-                padding: 0.5rem;
+            /* Smooth scrolling */
+            .main {
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
             }
         </style>
     """, unsafe_allow_html=True)
@@ -134,7 +155,7 @@ def main():
             st.markdown('<div class="table-container">', unsafe_allow_html=True)
             st.dataframe(
                 country_data[[
-                    'Role', 'Monthly Gross Salary (in ZMW)', 
+                    'Role', 'Monthly Gross Salary (in ZMW)',
                     'Salary Gross in USD', 'Years of Experience',
                     'Industry', 'Company location (Country)'
                 ]].sort_values('Monthly Gross Salary (in ZMW)', ascending=False),
