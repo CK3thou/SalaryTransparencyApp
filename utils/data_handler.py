@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from datetime import datetime
 
 def clean_salary_data(df):
     """Clean and format salary data"""
@@ -35,13 +36,16 @@ def clean_salary_data(df):
             'Role', 'Company location (Country)', 'Monthly Gross Salary (in ZMW)',
             'Salary Gross in USD', 'Years of Experience', 'Degree',
             'Approx. No. of employees in company', 'Your Country/ Location',
-            'Nationality', 'Industry'
+            'Nationality', 'Industry', 'Submission Date'
         ]
 
         # Ensure all required columns exist
         for col in columns_to_keep:
             if col not in df.columns:
-                df[col] = None
+                if col == 'Submission Date':
+                    df[col] = pd.Timestamp.now()  # Use current time for existing entries
+                else:
+                    df[col] = None
 
         df = df[columns_to_keep]
 
@@ -66,7 +70,7 @@ def load_data():
         'Role', 'Company location (Country)', 'Monthly Gross Salary (in ZMW)',
         'Salary Gross in USD', 'Years of Experience', 'Degree',
         'Approx. No. of employees in company', 'Your Country/ Location',
-        'Nationality', 'Industry'
+        'Nationality', 'Industry', 'Submission Date'
     ])
 
     try:
@@ -88,6 +92,9 @@ def load_data():
 
 def save_submission(data):
     """Save new submission to the current data file"""
+    # Add submission timestamp
+    data['Submission Date'] = pd.Timestamp.now()
+
     df = load_data()
     new_row = pd.DataFrame([data])
 
@@ -111,6 +118,10 @@ def save_submission(data):
 def save_uploaded_file(df):
     """Save uploaded Excel file data"""
     try:
+        # Add submission timestamp for new entries if column doesn't exist
+        if 'Submission Date' not in df.columns:
+            df['Submission Date'] = pd.Timestamp.now()
+
         # Clean data before saving
         df = clean_salary_data(df)
         # Save to both Excel and CSV for backup

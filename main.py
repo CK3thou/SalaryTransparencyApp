@@ -153,12 +153,18 @@ def main():
             # Data table with horizontal scroll on mobile
             st.subheader("Detailed Data")
             st.markdown('<div class="table-container">', unsafe_allow_html=True)
+            display_df = country_data[[
+                'Role', 'Monthly Gross Salary (in ZMW)',
+                'Salary Gross in USD', 'Years of Experience',
+                'Industry', 'Company location (Country)',
+                'Submission Date'
+            ]].sort_values('Submission Date', ascending=False)
+
+            # Format the date for display
+            display_df['Submission Date'] = pd.to_datetime(display_df['Submission Date']).dt.strftime('%Y-%m-%d')
+
             st.dataframe(
-                country_data[[
-                    'Role', 'Monthly Gross Salary (in ZMW)',
-                    'Salary Gross in USD', 'Years of Experience',
-                    'Industry', 'Company location (Country)'
-                ]].sort_values('Monthly Gross Salary (in ZMW)', ascending=False),
+                display_df,
                 use_container_width=True,
                 hide_index=True
             )
