@@ -2,47 +2,91 @@ import streamlit as st
 import pandas as pd
 from utils.data_handler import load_data, save_uploaded_file
 
+def generate_reset_code():
+    """Generate a temporary reset code"""
+    import secrets
+    return secrets.token_hex(4)  # 8 character hex code
+
 def check_password():
     """Returns `True` if the user had the correct password."""
 
     # Initialize session state
     if 'password_correct' not in st.session_state:
         st.session_state.password_correct = False
+    if 'reset_mode' not in st.session_state:
+        st.session_state.reset_mode = False
+    if 'reset_code' not in st.session_state:
+        st.session_state.reset_code = None
 
     if not st.session_state.password_correct:
-        # Show password input
-        password = st.text_input(
-            "Please enter the admin password", 
-            type="password",
-            key="password_input"
-        )
+        st.title("Admin Login")
 
-        if st.button("Login"):
-            try:
-                # Try both ways of accessing the secret
-                stored_password = None
+        # Create columns for layout
+        col1, col2 = st.columns(2)
+
+        with col1:
+            # Show password input
+            password = st.text_input(
+                "Please enter the admin password", 
+                type="password",
+                key="password_input"
+            )
+
+            if st.button("Login"):
                 try:
-                    stored_password = st.secrets["admin_password"]
-                except:
+                    # Try both ways of accessing the secret
+                    stored_password = None
                     try:
-                        stored_password = st.secrets.admin_password
-                    except Exception as e:
-                        st.error(f"Could not access admin_password from secrets: {str(e)}")
+                        stored_password = st.secrets["admin_password"]
+                    except:
+                        try:
+                            stored_password = st.secrets.admin_password
+                        except Exception as e:
+                            st.error(f"Could not access admin_password from secrets: {str(e)}")
+                            return False
+
+                    if stored_password is None:
+                        st.error("Admin password is not properly configured. Please contact support.")
                         return False
 
-                if stored_password is None:
-                    st.error("Admin password is not properly configured. Please contact support.")
+                    if password == stored_password:
+                        st.session_state.password_correct = True
+                        st.rerun()
+                    else:
+                        st.error("😕 Password incorrect")
+                        return False
+                except Exception as e:
+                    st.error(f"Authentication error: {str(e)}")
                     return False
 
-                if password == stored_password:
-                    st.session_state.password_correct = True
-                    st.rerun()
-                else:
-                    st.error("😕 Password incorrect")
-                    return False
-            except Exception as e:
-                st.error(f"Authentication error: {str(e)}")
-                return False
+        with col2:
+            st.markdown("---")
+            if st.button("Need to reset password?"):
+                st.session_state.reset_mode = True
+                st.session_state.reset_code = generate_reset_code()
+                st.info(f"""
+                To reset your password, please contact support with this temporary reset code:
+
+                **{st.session_state.reset_code}**
+
+                Keep this code safe - you'll need it to set your new password.
+                """)
+
+            if st.session_state.reset_mode:
+                reset_code = st.text_input("Enter reset code:", key="reset_code_input")
+                new_password = st.text_input("New password:", type="password", key="new_password_input")
+
+                if st.button("Set New Password"):
+                    if reset_code == st.session_state.reset_code:
+                        try:
+                            # Update the password using ask_secrets
+                            st.experimental_set_query_params(update_password="true", new_password=new_password)
+                            st.success("Password reset request submitted. Please wait...")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error resetting password: {str(e)}")
+                    else:
+                        st.error("Invalid reset code")
 
     return st.session_state.password_correct
 
