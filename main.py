@@ -80,8 +80,10 @@ def main():
 
     st.title("Salary Transparency Platform")
 
-    # Load data
+    # Load data with debug information
+    st.write("Loading data...")
     df = load_data()
+    st.write(f"Data loaded with {len(df)} rows")
 
     # Main content
     st.subheader("Salary Data Overview")

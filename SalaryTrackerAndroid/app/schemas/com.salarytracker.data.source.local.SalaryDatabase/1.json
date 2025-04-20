@@ -1,0 +1,94 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "6802863250a706ad7c130ed443c47584",
+    "entities": [
+      {
+        "tableName": "salaries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `role` TEXT NOT NULL, `monthlyGrossSalary` REAL NOT NULL, `salaryInUSD` REAL NOT NULL, `yearsOfExperience` INTEGER NOT NULL, `industry` TEXT NOT NULL, `country` TEXT NOT NULL, `submissionDate` INTEGER NOT NULL, `educationLevel` TEXT NOT NULL, `companySize` TEXT NOT NULL, `remoteWorkPercentage` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "monthlyGrossSalary",
+            "columnName": "monthlyGrossSalary",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "salaryInUSD",
+            "columnName": "salaryInUSD",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yearsOfExperience",
+            "columnName": "yearsOfExperience",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "industry",
+            "columnName": "industry",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "submissionDate",
+            "columnName": "submissionDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "educationLevel",
+            "columnName": "educationLevel",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "companySize",
+            "columnName": "companySize",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remoteWorkPercentage",
+            "columnName": "remoteWorkPercentage",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6802863250a706ad7c130ed443c47584')"
+    ]
+  }
+}

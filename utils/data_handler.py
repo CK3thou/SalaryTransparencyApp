@@ -74,20 +74,52 @@ def load_data():
     ])
 
     try:
+        # Get the absolute path to the data directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(os.path.dirname(current_dir), 'data')
+        excel_path = os.path.join(data_dir, 'salary_data.xlsx')
+        csv_path = os.path.join(data_dir, 'salary_data.csv')
+
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Looking for data files in: {data_dir}")
+        print(f"Excel path: {excel_path}")
+        print(f"CSV path: {csv_path}")
+        print(f"Excel file exists: {os.path.exists(excel_path)}")
+        print(f"CSV file exists: {os.path.exists(csv_path)}")
+
         # Try to load Excel file first
-        if os.path.exists('data/salary_data.xlsx'):
-            df = pd.read_excel('data/salary_data.xlsx')
+        if os.path.exists(excel_path):
+            print("Found Excel file, loading data...")
+            try:
+                df = pd.read_excel(excel_path)
+                print(f"Successfully read Excel file with {len(df)} rows")
+            except Exception as e:
+                print(f"Error reading Excel file: {str(e)}")
+                raise
         # Fall back to CSV if Excel doesn't exist
-        elif os.path.exists('data/salary_data.csv'):
-            df = pd.read_csv('data/salary_data.csv')
+        elif os.path.exists(csv_path):
+            print("Found CSV file, loading data...")
+            try:
+                df = pd.read_csv(csv_path)
+                print(f"Successfully read CSV file with {len(df)} rows")
+            except Exception as e:
+                print(f"Error reading CSV file: {str(e)}")
+                raise
         else:
+            print("No data files found, returning empty DataFrame")
             return empty_df
 
         # Clean and format the data
+        print("Cleaning data...")
         df = clean_salary_data(df)
+        print(f"Successfully loaded and cleaned {len(df)} rows of data")
+        print("Columns in final DataFrame:", df.columns.tolist())
         return df
     except Exception as e:
         print(f"Error loading data: {str(e)}")
+        import traceback
+        print("Full traceback:")
+        print(traceback.format_exc())
         return empty_df
 
 def save_submission(data):
@@ -95,21 +127,27 @@ def save_submission(data):
     # Add submission timestamp
     data['Submission Date'] = pd.Timestamp.now()
 
-    df = load_data()
-    new_row = pd.DataFrame([data])
-
     try:
+        # Get the absolute path to the data directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(os.path.dirname(current_dir), 'data')
+        excel_path = os.path.join(data_dir, 'salary_data.xlsx')
+        csv_path = os.path.join(data_dir, 'salary_data.csv')
+
+        df = load_data()
+        new_row = pd.DataFrame([data])
+
         # If Excel file exists, append to it
-        if os.path.exists('data/salary_data.xlsx'):
+        if os.path.exists(excel_path):
             df = pd.concat([df, new_row], ignore_index=True)
-            df.to_excel('data/salary_data.xlsx', index=False)
+            df.to_excel(excel_path, index=False)
         else:
             # Otherwise, append to CSV
-            if os.path.exists('data/salary_data.csv'):
+            if os.path.exists(csv_path):
                 df = pd.concat([df, new_row], ignore_index=True)
             else:
                 df = new_row
-            df.to_csv('data/salary_data.csv', index=False)
+            df.to_csv(csv_path, index=False)
         return True
     except Exception as e:
         print(f"Error saving submission: {str(e)}")
@@ -118,6 +156,12 @@ def save_submission(data):
 def save_uploaded_file(df):
     """Save uploaded Excel file data"""
     try:
+        # Get the absolute path to the data directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(os.path.dirname(current_dir), 'data')
+        excel_path = os.path.join(data_dir, 'salary_data.xlsx')
+        csv_path = os.path.join(data_dir, 'salary_data.csv')
+
         # Add submission timestamp for new entries if column doesn't exist
         if 'Submission Date' not in df.columns:
             df['Submission Date'] = pd.Timestamp.now()
@@ -125,8 +169,8 @@ def save_uploaded_file(df):
         # Clean data before saving
         df = clean_salary_data(df)
         # Save to both Excel and CSV for backup
-        df.to_excel('data/salary_data.xlsx', index=False)
-        df.to_csv('data/salary_data.csv', index=False)
+        df.to_excel(excel_path, index=False)
+        df.to_csv(csv_path, index=False)
         return True
     except Exception as e:
         print(f"Error saving uploaded file: {str(e)}")

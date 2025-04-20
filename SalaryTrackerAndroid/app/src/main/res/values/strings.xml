@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Salary Tracker</string>
+    <string name="add_salary">Add Salary</string>
+    <string name="filter_by_country">Filter by Country</string>
+    <string name="all_countries">All Countries</string>
+    <string name="salary_details">Salary Details</string>
+    <string name="submit_salary">Submit Salary</string>
+    <string name="error_loading_data">Error loading data</string>
+    <string name="retry">Retry</string>
+</resources> 
