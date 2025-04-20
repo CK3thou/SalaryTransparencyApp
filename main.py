@@ -8,6 +8,7 @@ from utils.visualizations import (
 )
 from components.forms import submission_form
 from components.filters import country_filter
+import os
 
 st.set_page_config(
     page_title="Salary Transparency Platform",
@@ -181,4 +182,5 @@ def main():
         submission_form(save_submission)
 
 if __name__ == "__main__":
+    os.system('taskkill /F /IM streamlit.exe')
     main()
