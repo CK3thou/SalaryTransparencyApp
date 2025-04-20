@@ -1,4 +1,16 @@
 import streamlit as st
+from forex_python.converter import CurrencyRates
+from datetime import datetime
+
+def get_exchange_rate():
+    """Get current exchange rate from USD to ZMW"""
+    try:
+        c = CurrencyRates()
+        rate = c.get_rate('USD', 'ZMW')
+        return rate
+    except Exception as e:
+        st.error(f"Error getting exchange rate: {str(e)}")
+        return None
 
 def submission_form(save_callback):
     """Render and handle the salary submission form"""
@@ -9,18 +21,46 @@ def submission_form(save_callback):
         with col1:
             role = st.text_input("Role*", key="role_mobile")
             company_location = st.text_input("Company Location*", key="location_mobile")
+            
+            # Salary inputs with currency conversion
             salary_zmw = st.number_input(
                 "Monthly Salary (ZMW)*",
                 min_value=0.0,
                 value=0.0,
-                key="salary_zmw_mobile"
+                key="salary_zmw_mobile",
+                on_change=lambda: update_usd_salary()
             )
+            
+            # Add a button to convert between currencies
+            if st.button("Get Current Exchange Rate"):
+                rate = get_exchange_rate()
+                if rate:
+                    st.info(f"Current USD to ZMW rate: {rate:.2f}")
+            
             salary_usd = st.number_input(
                 "Salary in USD",
                 min_value=0.0,
                 value=0.0,
-                key="salary_usd_mobile"
+                key="salary_usd_mobile",
+                on_change=lambda: update_zmw_salary()
             )
+            
+            # Function to update USD salary when ZMW changes
+            def update_usd_salary():
+                rate = get_exchange_rate()
+                if rate and salary_zmw > 0:
+                    converted_usd = salary_zmw / rate
+                    st.session_state.salary_usd_mobile = converted_usd
+                    st.info(f"Converted USD amount: {converted_usd:.2f}")
+            
+            # Function to update ZMW salary when USD changes
+            def update_zmw_salary():
+                rate = get_exchange_rate()
+                if rate and salary_usd > 0:
+                    converted_zmw = salary_usd * rate
+                    st.session_state.salary_zmw_mobile = converted_zmw
+                    st.info(f"Converted ZMW amount: {converted_zmw:.2f}")
+            
             experience = st.number_input(
                 "Years of Experience*",
                 min_value=0,
